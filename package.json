@@ -1,0 +1,14 @@
+{
+  "name": "industrial-digital-twin",
+  "version": "1.0.0",
+  "description": "Real-Time Digital Twin for Industrial Process Monitoring",
+  "scripts": {
+    "start:backend": "cd backend && node server.js",
+    "start:frontend": "cd frontend && npm run dev",
+    "start:simulator": "node simulator.js",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install"
+  },
+  "dependencies": {
+    "mqtt": "^5.5.0"
+  }
+}
