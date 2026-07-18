@@ -23,7 +23,6 @@ build/
 .env.test.local
 .env.production.local
 .env.staging.local
-.env.local
 
 # OS/System files
 .DS_Store
