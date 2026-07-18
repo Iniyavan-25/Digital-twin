@@ -10,10 +10,10 @@ This project is built using a decoupled, event-driven architecture designed to m
 
 ```mermaid
 graph TD
-    A[ESP32 Simulator / Node.js Simulator] -- Telemetry: Temp, Pressure -->|MQTT Protocol| B(Public HiveMQ Broker)
-    B -- MQTT Topics --> C[Node.js Backend Gateway]
-    C -- Real-time Updates -->|WebSockets Socket.io| D[React Frontend Dashboard]
-    D -- Interactive Control / Alerts --> C
+    A[ESP32 Simulator / Node.js Simulator] -->|"Telemetry (Temp, Pressure) via MQTT"| B(Public HiveMQ Broker)
+    B -->|MQTT Topics| C[Node.js Backend Gateway]
+    C -->|"WebSockets (Socket.io)"| D[React Frontend Dashboard]
+    D -->|"Interactive Control / Alerts"| C
 ```
 
 1. **IoT Telemetry Source**: The boiler system state is simulated either via a Node.js simulator (`simulator.js`) or an ESP32 hardware simulator (`wokwi_esp32.ino`) running in the Wokwi web interface.
