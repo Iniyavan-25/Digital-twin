@@ -45,3 +45,12 @@ desktop.ini
 # Tool/Agent folders
 .gemini/
 .agents/
+
+# ESP-IDF firmware (local reference, not for GitHub)
+esp_idf_firmware/
+
+# Generated guides and PDFs
+ESP32_Digital_Twin_Guide.html
+ESP32_Digital_Twin_Guide.pdf
+ESP32_Interview_CheatSheet.html
+ESP32_Interview_CheatSheet.pdf
