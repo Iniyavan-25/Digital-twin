@@ -45,7 +45,6 @@ client.on('connect', () => {
     });
   }, 500);
 });
-
 client.on('error', (err) => {
   console.error('Simulator MQTT Error:', err);
 });
