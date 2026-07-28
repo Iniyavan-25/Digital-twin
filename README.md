@@ -1,6 +1,6 @@
 # Industrial Process Monitoring Digital Twin
 
-A real-time, event-driven industrial process monitoring digital twin designed to visualize telemetry from factory machinery. It features a complete end-to-end data pipeline streaming MQTT telemetry through a Node.js gateway, feeding a responsive React dashboard in real time using WebSockets.
+A real-time, event-driven industrial process monitoring digital twin designed to visualize telemetry from factory machinery. It features a complete end-to-end data pipeline streaming MQTT telemetry through a Node.js gateway, persisting data in a SQLite database, and feeding a responsive React dashboard in real time using WebSockets.
 
 ---
 
@@ -12,14 +12,18 @@ This project is built using a decoupled, event-driven architecture designed to m
 graph TD
     A[ESP32 Simulator / Node.js Simulator] -->|"Telemetry (Temp, Pressure) via MQTT"| B(Public HiveMQ Broker)
     B -->|MQTT Topics| C[Node.js Backend Gateway]
+    C -->|"INSERT into telemetry table"| E[(SQLite Database)]
     C -->|"WebSockets (Socket.io)"| D[React Frontend Dashboard]
     D -->|"Interactive Control / Alerts"| C
+    D -->|"GET /api/history"| C
+    C -->|"SELECT from DB"| E
 ```
 
 1. **IoT Telemetry Source**: The boiler system state is simulated either via a Node.js simulator (`simulator.js`) or an ESP32 hardware simulator (`wokwi_esp32.ino`) running in the Wokwi web interface.
 2. **MQTT Broker**: Data is published to the public HiveMQ Broker (`broker.hivemq.com`) on the topic `factory/boiler/data`.
-3. **Backend Gateway**: A Node.js and Express server acts as a middleman. It subscribes to HiveMQ, receives the telemetry payloads, processes/enhances them, and broadcasts them immediately.
-4. **Frontend Dashboard**: A React frontend dashboard built using Vite, TailwindCSS v4, and Recharts. It connects to the backend via WebSockets (`Socket.io-client`) to visualize live gauges, historic charts, and safety warnings in real time.
+3. **Backend Gateway**: A Node.js and Express server acts as a middleman. It subscribes to HiveMQ, receives the telemetry payloads, processes/enhances them, persists every reading into the SQLite database, and broadcasts them immediately via WebSockets.
+4. **SQLite Database**: A lightweight, file-based SQL database (`telemetry.db`) that stores every incoming telemetry reading permanently. This enables historical analysis, trend detection, and data retrieval via the REST API.
+5. **Frontend Dashboard**: A React frontend dashboard built using Vite, TailwindCSS v4, and Recharts. It connects to the backend via WebSockets (`Socket.io-client`) to visualize live gauges, historic charts, and safety warnings in real time.
 
 ---
 
@@ -37,6 +41,7 @@ graph TD
 *   **Node.js / Express** - Lightweight server framework.
 *   **MQTT.js** - Node client to connect to HiveMQ.
 *   **Socket.io** - WebSocket server management.
+*   **SQLite3 / sqlite** - Lightweight, file-based SQL database for persistent telemetry storage.
 
 ### IoT / Simulators
 *   **C++ & Arduino libraries (`wokwi_esp32.ino`)** - ESP32 script ready for Wokwi cloud simulation using standard library components like `PubSubClient` and `ArduinoJson`.
@@ -77,6 +82,33 @@ To run the complete system, open three terminal windows and run the following sc
     npm run start:simulator
     ```
     *(Starts generating boiler data. You should immediately see updates on your React dashboard!)*
+
+---
+
+## 📊 Database & REST API
+
+Every telemetry reading received from the simulator is automatically stored in a local SQLite database (`backend/telemetry.db`). The database file is auto-created on first run.
+
+**Schema (`telemetry` table):**
+
+| Column | Type | Description |
+| :--- | :--- | :--- |
+| `id` | INTEGER (PK) | Auto-incrementing unique ID |
+| `device_id` | TEXT | Identifier of the machine (e.g., `boiler-twin-01`) |
+| `temperature` | REAL | Temperature reading in °C |
+| `pressure` | REAL | Pressure reading in bar |
+| `status` | TEXT | Machine state: `NORMAL`, `WARNING`, or `CRITICAL` |
+| `timestamp` | TEXT | ISO 8601 timestamp of the reading |
+
+**API Endpoints:**
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/status` | Returns server status and MQTT connection info |
+| `GET` | `/api/history` | Returns the last 100 telemetry records from the database |
+| `GET` | `/api/history?limit=500` | Returns the last N records (customizable via query param) |
+
+> **Note:** The `telemetry.db` file is excluded from Git via `.gitignore`. Each developer's local database is generated fresh on first run.
 
 ---
 
