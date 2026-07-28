@@ -54,3 +54,8 @@ ESP32_Digital_Twin_Guide.html
 ESP32_Digital_Twin_Guide.pdf
 ESP32_Interview_CheatSheet.html
 ESP32_Interview_CheatSheet.pdf
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
